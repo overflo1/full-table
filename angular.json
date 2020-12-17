@@ -3,5 +3,48 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-  }
+    "full-table": {
+      "projectType": "library",
+      "root": "projects/full-table",
+      "sourceRoot": "projects/full-table/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "tsConfig": "projects/full-table/tsconfig.lib.json",
+            "project": "projects/full-table/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/full-table/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/full-table/src/test.ts",
+            "tsConfig": "projects/full-table/tsconfig.spec.json",
+            "karmaConfig": "projects/full-table/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/full-table/tsconfig.lib.json",
+              "projects/full-table/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    }},
+  "cli": {
+    "analytics": "68e61051-9eea-4c64-ae6f-118a8bff87ff"
+  },
+  "defaultProject": "full-table"
 }

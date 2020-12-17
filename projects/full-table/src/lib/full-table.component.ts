@@ -1,4 +1,27 @@
-import {AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
+import {QueryJoin, QueryJoinArr, QuerySort, RequestQueryBuilder, SCondition} from '@nestjsx/crud-request';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatSort} from '@angular/material/sort';
+import {merge, Observable, of} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {MatDialog} from '@angular/material/dialog';
+import {FormBuilder, FormGroup} from '@angular/forms';
+import {catchError, filter, map, startWith, switchMap} from 'rxjs/operators';
+import {ColumnListModel} from './model/column-list.model';
+import {GetManyModel} from './model/get-many.model';
+import {FullTableDialogComponent} from './full-table-dialog/full-table-dialog.component';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'lib-full-table',
@@ -138,54 +161,51 @@ import {AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit} from '
     './full-table.component.scss'
   ]
 })
-export class FullTableComponent implements OnInit, OnChanges, AfterViewInit {
+export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
 
-  @Input() path: string;
-  @Input() columnList: any;
-  /*    {
-      def: string, name: string, value: string |
-        { type: string, icon: string, filter: (element) => boolean }[] |
-        ((element) => string), sort?: boolean
-    }[];*/
+  @Input() path!: string;
+  @Input() BASE_PATH!: string;
+  @Input() columnList!: ColumnListModel[];
   @Input() columnMobile?: any;
-  @Input() actions?: EventEmitter<void | { type: string, element: any }>;
-  @Input() search?: SCondition;
-  @Input() join?;
+  @Input() actions = new EventEmitter<void | { type: string, element: T }>();
+  @Input() search: SCondition = {};
+  @Input() join?: QueryJoin | QueryJoinArr | (QueryJoin | QueryJoinArr)[];
   @Input() defaultSort?: QuerySort;
-  @Input() pageSize?;
+  @Input() pageSize?: number;
   @Output() data = new EventEmitter<any[]>();
 
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild(MatSort, {static: false}) sort: MatSort;
-  elementList: any[];
-  displayedColumns: string[];
-  elementLenght: number;
+  @ViewChild(MatPaginator, {static: true}) paginator!: MatPaginator;
+  @ViewChild(MatSort, {static: false}) sort!: MatSort;
+  elementList: T[] = [];
+  displayedColumns!: string[];
+  elementLenght = 0;
   loading = true;
 
   isMobileLayout = window.innerWidth < 600;
 
-  filterForm = this.fb.group({
-    column: [''],
-    operation: ['='],
-    value: [''],
-  });
-  filteredColumnsForm$: Observable<any>;
-  chipList = [];
-  @ViewChild(MatMenuTrigger, {static: false}) trigger: MatMenuTrigger;
+  filterForm: FormGroup;
+
+  filteredColumnsForm$ = new Observable();
+  chipList: {column: string, operation: string, value: any}[] = [];
 
   constructor(
     private http: HttpClient,
     private dialog: MatDialog,
     private fb: FormBuilder,
   ) {
+    this.filterForm = fb.group({
+      column: [''],
+      operation: ['='],
+      value: [''],
+    });
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize(event) {
+  onResize(event: any): void {
     this.isMobileLayout = event.target.innerWidth < 600;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     if (!this.columnMobile) {
       this.columnMobile = this.columnList[0];
     }
@@ -196,12 +216,17 @@ export class FullTableComponent implements OnInit, OnChanges, AfterViewInit {
       this.actions = new EventEmitter<void | { type: string, element: any }>();
     }
     // FILTER FORM THINGS
-    this.filteredColumnsForm$ = this.filterForm.get('column').valueChanges.pipe(
-      startWith(''),
-      map(value =>
-        this.columnList.filter(col => col.name.toLowerCase().includes(value ? value.toLowerCase() : '') && col.def !== 'actions')
-      )
-    );
+    const columControl = this.filterForm.get('column');
+    if (columControl) {
+      this.filteredColumnsForm$ = columControl.valueChanges.pipe(
+        startWith(''),
+        map(value =>
+          this.columnList.filter((col: { name: string; def: string; }) =>
+            col.name.toLowerCase().includes(value ? value.toLowerCase() : '') && col.def !== 'actions'
+          )
+        )
+      );
+    }
     this.displayedColumns = this.columnList.map(x => x.def);
     this.paginator._intl.firstPageLabel = 'prima pagina';
     this.paginator._intl.itemsPerPageLabel = 'elementi per pagina';
@@ -212,11 +237,11 @@ export class FullTableComponent implements OnInit, OnChanges, AfterViewInit {
       `${page * pageSize + 1} - ${page * pageSize + pageSize > length ? length : page * pageSize + pageSize} di ${length}`;
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
     merge(this.sort.sortChange, this.paginator.page, this.actions)
       .pipe(
-        filter((a: Sort | PageEvent | undefined | { type: string, element: any }) => {
+        filter((a: any) => {
           return a === undefined || !('type' in a);
         }),
         startWith({}),
@@ -235,16 +260,22 @@ export class FullTableComponent implements OnInit, OnChanges, AfterViewInit {
           this.loading = false;
           return of([]);
         })
-      ).subscribe(data => this.elementList = data);
-    this.filterForm.get('column').valueChanges.subscribe(col => {
-      // for boolean init false
-      if (this.getFilterColumnType() === 'boolean' && !this.filterForm.get('value').value) {
-        this.filterForm.get('value').setValue(false);
-      }
-    });
+      ).subscribe((data: T[]) => this.elementList = data);
+    const columnControl = this.filterForm.get('column');
+    if (columnControl) {
+      columnControl.valueChanges.subscribe(() => {
+        // for boolean init false
+        const valueControl = this.filterForm.get('value');
+        if (valueControl) {
+          if (this.getFilterColumnType() === 'boolean' && !valueControl.value) {
+            valueControl.setValue(false);
+          }
+        }
+      });
+    }
   }
 
-  getData(sort: string, order: string, limit: number, page: number, search: SCondition): Observable<any> {
+  getData(sort: string, order: string, limit: number, page: number, search: SCondition): Observable<GetManyModel<T>> {
     let qbSort: QuerySort = {field: 'id', order: 'DESC'};
     if (sort) {
       qbSort = {field: sort, order: order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'};
@@ -261,7 +292,7 @@ export class FullTableComponent implements OnInit, OnChanges, AfterViewInit {
       qb.search(search);
     }
     if (this.chipList) {
-      let s = {};
+      let s: any = {};
       for (const f of this.chipList) {
         const cl = this.columnList.find(c => c.name === f.column);
         if (cl) {
@@ -278,11 +309,11 @@ export class FullTableComponent implements OnInit, OnChanges, AfterViewInit {
       qb.setJoin(this.join);
     }
     const requestUrl =
-      `${environment.BASE_PATH}/${this.path}?${qb.query()}`;
-    return this.http.get(requestUrl);
+      `${this.BASE_PATH}/${this.path}?${qb.query()}`;
+    return this.http.get<GetManyModel<T>>(requestUrl);
   }
 
-  getSearchOperation(op: string, value: any) {
+  getSearchOperation(op: string, value: any): SCondition {
     switch (op) {
       case '!=':
         return {$ne: value};
@@ -302,15 +333,15 @@ export class FullTableComponent implements OnInit, OnChanges, AfterViewInit {
     this.actions.emit();
   }
 
-  openMobileDialog(element: any) {
+  openMobileDialog(element: any): void {
     this.dialog.open(FullTableDialogComponent, {data: {element, columnList: this.columnList, actions: this.actions}});
   }
 
-  clickedAction(element: any) {
+  clickedAction(element: any): void {
     this.actions.emit({type: 'click', element});
   }
 
-  applyFilter() {
+  applyFilter(): void {
     if (this.filterForm.valid) {
       /*if (moment.isMoment(this.filterForm.value.value)) {
         this.filterForm.controls.value.setValue(moment(this.filterForm.value.value).format('MM/DD/YYYY'));
@@ -321,7 +352,7 @@ export class FullTableComponent implements OnInit, OnChanges, AfterViewInit {
     this.filterForm.reset();
   }
 
-  removeChip(chip) {
+  removeChip(chip: {column: string, operation: string, value: any}): void {
     const index = this.chipList.findIndex(c => _.isEqual(c, chip));
     if (index >= 0) {
       this.chipList.splice(index, 1);
@@ -329,37 +360,43 @@ export class FullTableComponent implements OnInit, OnChanges, AfterViewInit {
     this.actions.emit();
   }
 
-  getFilterColumnType(): string {
-    const col = this.filterForm.get('column').value;
-    if (col) {
-      const cl = this.columnList.find(c => c.name === col);
-      // if is is specified
-      if (cl && cl.type) {
-        return cl.type;
-      }
-      // string is default
-      return 'string';
+  getFilterColumnType(): string | null {
+    const columnControl = this.filterForm.get('column');
+    if (columnControl) {
+      const col = columnControl.value;
+      if (col) {
+        const cl = this.columnList.find(c => c.name === col);
+        // if is is specified
+        if (cl && cl.type) {
+          return cl.type;
+        }
+        // string is default
+        return 'string';
 
-      // if it is not specified try to check (i hope never)
-      if (this.elementList[0][cl.def]) {
-        /*if (Date.parse(this.elementList[0][cl.def])) {
-          return 'date';
+        // if it is not specified try to check (i hope never)
+        /*if (this.elementList[0][cl.def]) {
+          if (Date.parse(this.elementList[0][cl.def])) {
+            return 'date';
+          }
+          return typeof this.elementList[0][cl.def];
         }*/
-        return typeof this.elementList[0][cl.def];
       }
     }
     return null;
   }
 
-  getFilterDefault() {
-    const col = this.filterForm.get('column').value;
-    if (col) {
-      const cl = this.columnList.find(c => c.name === col);
-      if (cl && cl.filterDefault) {
-        return cl.filterDefault;
+  getFilterDefault(): {title: string, value: string}[] {
+    const columnControl = this.filterForm.get('column');
+    if (columnControl) {
+      const col = columnControl.value;
+      if (col) {
+        const cl = this.columnList.find(c => c.name === col);
+        if (cl && cl.filterDefault) {
+          return cl.filterDefault;
+        }
       }
-      return [];
     }
+    return [];
   }
 }
 

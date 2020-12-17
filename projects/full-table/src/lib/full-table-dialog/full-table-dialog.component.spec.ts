@@ -1,6 +1,5 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-
-import {FullTableDialogComponent} from './details-dialog.component';
+import {FullTableDialogComponent} from './full-table-dialog.component';
 
 describe('DetailsDialogComponent', () => {
   let component: FullTableDialogComponent;

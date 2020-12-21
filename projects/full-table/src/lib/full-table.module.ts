@@ -49,11 +49,10 @@ import {MatInputModule} from '@angular/material/input';
   exports: [FullTableComponent]
 })
 export class FullTableModule {
-  static forRoot(BASE_PATH: string): ModuleWithProviders<FullTableModule> {
-    console.log(BASE_PATH);
+  static forRoot(BASE_PATH?: string): ModuleWithProviders<FullTableModule> {
     return {
       ngModule: FullTableModule,
-      providers: [{provide: 'BASE_PATH', useValue: BASE_PATH}]
+      providers: [{provide: 'BASE_PATH', useValue: BASE_PATH ? BASE_PATH : ''}]
     };
   }
 }

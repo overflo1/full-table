@@ -164,10 +164,11 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
       let s: any = {};
       for (const f of this.chipList) {
         const cl = this.columnList.find(c => c.name === f.column);
+        const type = cl ? cl.type ? cl.type : 'string' : 'string';
         if (cl) {
-          s[cl.def] = this.getSearchOperation(f.operation, f.value);
+          s[cl.def] = this.getSearchOperation(f.operation, f.value, type);
         } else {
-          s[f.column] = this.getSearchOperation(f.operation, f.value);
+          s[f.column] = this.getSearchOperation(f.operation, f.value, type);
         }
       }
       s = {...search, ...s};
@@ -182,7 +183,11 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
     return this.http.get<GetManyModel<T>>(requestUrl);
   }
 
-  getSearchOperation(op: string, value: any): SCondition {
+  getSearchOperation(op: string, value: any, type: string): SCondition {
+
+    if (type === 'string') {
+      return {$contL: value};
+    }
     switch (op) {
       case '!=':
         return {$ne: value};

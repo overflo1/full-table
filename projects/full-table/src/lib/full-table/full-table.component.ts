@@ -62,7 +62,6 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
     private fb: FormBuilder,
     @Inject('BASE_PATH') BASE_PATH: string,
   ) {
-    console.log(BASE_PATH);
     this.BASE_PATH = BASE_PATH;
     this.filterForm = fb.group({
       column: [''],
@@ -173,7 +172,7 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
         }
       }
       s = {...search, ...s};
-      console.log('filters ', s);
+      // console.log('filters ', s);
       qb.search(s);
     }
     if (this.join) {

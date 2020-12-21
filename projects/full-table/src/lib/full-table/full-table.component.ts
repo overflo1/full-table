@@ -2,7 +2,7 @@ import {
   AfterViewInit,
   Component,
   EventEmitter,
-  HostListener,
+  HostListener, Inject,
   Input,
   OnChanges,
   OnInit,
@@ -22,6 +22,7 @@ import {ColumnListModel} from '../model/column-list.model';
 import {GetManyModel} from '../model/get-many.model';
 import {FullTableDialogComponent} from '../full-table-dialog/full-table-dialog.component';
 import * as _ from 'lodash';
+import {FullTableModule} from '../full-table.module';
 
 @Component({
   selector: 'lib-full-table',
@@ -31,7 +32,7 @@ import * as _ from 'lodash';
 export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
 
   @Input() path!: string;
-  @Input() BASE_PATH!: string;
+  @Input() BASE_PATH = '';
   @Input() columnList!: ColumnListModel[];
   @Input() columnMobile?: any;
   @Input() actions = new EventEmitter<void | { type: string, element: T }>();
@@ -59,7 +60,10 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
     private http: HttpClient,
     private dialog: MatDialog,
     private fb: FormBuilder,
+    @Inject('BASE_PATH') BASE_PATH: string,
   ) {
+    console.log(BASE_PATH);
+    this.BASE_PATH = BASE_PATH;
     this.filterForm = fb.group({
       column: [''],
       operation: ['='],

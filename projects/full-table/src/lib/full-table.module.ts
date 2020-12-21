@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import {ModuleWithProviders, NgModule} from '@angular/core';
 import { FullTableComponent } from './full-table/full-table.component';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatIconModule} from '@angular/material/icon';
@@ -48,4 +48,12 @@ import {MatInputModule} from '@angular/material/input';
   ],
   exports: [FullTableComponent]
 })
-export class FullTableModule { }
+export class FullTableModule {
+  static forRoot(BASE_PATH: string): ModuleWithProviders<FullTableModule> {
+    console.log(BASE_PATH);
+    return {
+      ngModule: FullTableModule,
+      providers: [{provide: 'BASE_PATH', useValue: BASE_PATH}]
+    };
+  }
+}

@@ -7,5 +7,11 @@
       "lodash": "_",
       "@nestjsx/crud-request": "crudRequest"
     }
-  }
+  },
+  "whitelistedNonPeerDependencies": [
+    "tslib",
+    "@nestjsx/crud-request",
+    "@types/lodash",
+    "lodash"
+  ]
 }

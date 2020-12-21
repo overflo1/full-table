@@ -22,7 +22,6 @@ import {ColumnListModel} from '../model/column-list.model';
 import {GetManyModel} from '../model/get-many.model';
 import {FullTableDialogComponent} from '../full-table-dialog/full-table-dialog.component';
 import * as _ from 'lodash';
-import {FullTableModule} from '../full-table.module';
 
 @Component({
   selector: 'lib-full-table',

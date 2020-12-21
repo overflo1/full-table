@@ -1,24 +1,41 @@
 # FullTable
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.0.4.
+This library let you use the component `<lib-full-table>` that provides you a sortable, pageable, filterable angular material table which generates automatic queries based on [nestjs/crud](https://github.com/nestjsx/crud).
 
-## Code scaffolding
+## Setup
 
-Run `ng generate component component-name --project full-table` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project full-table`.
-> Note: Don't forget to add `--project full-table` or else it will be added to the default project in your `angular.json` file. 
+Add `import {FullTableModule} from '@overflo-srl/full-table';` in your module. You also need to add your backend endpoint into `FullTableModule.forRoot(*** BASE_URL ***)`.
+> Note: you can also add enviromend variable like `FullTableModule.forRoot(enviroment.BASE_PATH)`
 
-## Build
+## Parameters
 
-Run `ng build full-table` to build the project. The build artifacts will be stored in the `dist/` directory.
+To generate the table you need to enter basic information for your entity:
 
-## Publishing
+`[PATH]: base path for your nestjs/crud entity ('/book)`
 
-After building your library with `ng build full-table`, go to the dist folder `cd dist/full-table` and run `npm publish`.
+`[columnList]: description and settings for your columns (ColumnListModel[])`
 
-## Running unit tests
+```
+interface ColumnListModel {
+  def: string;
+  name: string;
+  value: {type: string, icon: string, filter: ((e: any) => boolean)}[] | ((e: any) => string);
+  type?: string;
+  filterDefault?: {title: string, value: string}[];
+  sort?: boolean;
+}
+```
 
-Run `ng test full-table` to execute the unit tests via [Karma](https://karma-runner.github.io).
+OPTIONALS:
 
-## Further help
+`[columnMobile]: description and settings for your column responsive mobile column (() => string)`
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+`[actions]: action event emitter that emits when there is an event on the table (refresh every time a value is emitted)`
+
+`[search]: search query based on nestjs/crud`
+
+`[join]: join query based on nestjs/crud`
+
+`[defaultSort]: default sort column query based on nestjs/crud`
+
+`[pageSize]: page size number (default: 5)`

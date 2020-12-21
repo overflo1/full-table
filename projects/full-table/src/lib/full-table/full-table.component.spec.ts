@@ -3,8 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FullTableComponent } from './full-table.component';
 
 describe('FullTableComponent', () => {
-  let component: FullTableComponent;
-  let fixture: ComponentFixture<FullTableComponent>;
+  let component: FullTableComponent<any>;
+  let fixture: ComponentFixture<FullTableComponent<any>>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

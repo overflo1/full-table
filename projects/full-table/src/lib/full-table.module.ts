@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { FullTableComponent } from './full-table.component';
+import { FullTableComponent } from './full-table/full-table.component';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatIconModule} from '@angular/material/icon';
 import {MatMenuModule} from '@angular/material/menu';
@@ -21,8 +21,6 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {FullTableDialogComponent} from './full-table-dialog/full-table-dialog.component';
 import {MatButtonModule} from '@angular/material/button';
 import {MatInputModule} from '@angular/material/input';
-
-
 
 @NgModule({
   declarations: [FullTableComponent, FullTableDialogComponent],

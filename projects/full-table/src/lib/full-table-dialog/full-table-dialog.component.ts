@@ -4,26 +4,7 @@ import {ColumnListModel} from '../model/column-list.model';
 
 @Component({
   selector: 'lib-full-table-dialog',
-  template: `
-    <mat-dialog-content class="mat-body">
-      <ng-container *ngFor="let column of data.columnList">
-        <p style="word-wrap: break-word">
-          <b>{{column.name}}: </b>
-          <span *ngIf="column.def !== 'actions'">{{column.value(data.element)}}</span>
-          <span *ngIf="column.def === 'actions'">
-        <span *ngFor="let action of column.value">
-           <button (click)="data.actions.emit({type: action.type, element: data.element })"
-                   *ngIf="action.filter ? action.filter(data.element) : true"
-                   [matTooltip]="action.type"
-                   mat-dialog-close mat-icon-button>
-             <mat-icon>{{action.icon ? action.icon : action.type}}</mat-icon>
-           </button>
-        </span>
-    </span>
-        </p>
-      </ng-container>
-    </mat-dialog-content>
-  `,
+  templateUrl: `./full-table-dialog.component.html`,
   styleUrls: ['./full-table-dialog.component.scss']
 })
 export class FullTableDialogComponent implements OnInit {

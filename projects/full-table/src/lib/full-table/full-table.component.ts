@@ -18,148 +18,15 @@ import {HttpClient} from '@angular/common/http';
 import {MatDialog} from '@angular/material/dialog';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {catchError, filter, map, startWith, switchMap} from 'rxjs/operators';
-import {ColumnListModel} from './model/column-list.model';
-import {GetManyModel} from './model/get-many.model';
-import {FullTableDialogComponent} from './full-table-dialog/full-table-dialog.component';
+import {ColumnListModel} from '../model/column-list.model';
+import {GetManyModel} from '../model/get-many.model';
+import {FullTableDialogComponent} from '../full-table-dialog/full-table-dialog.component';
 import * as _ from 'lodash';
 
 @Component({
   selector: 'lib-full-table',
-  template: `
-    <mat-toolbar class="filter-toolbar" *ngIf="elementList?.length || chipList?.length">
-      <button #menuTrigger="matMenuTrigger" [mat-menu-trigger-for]="filterMenu" mat-icon-button>
-        <mat-icon>{{filterForm.valid ? 'done' : 'search'}}</mat-icon>
-      </button>
-      <mat-menu #filterMenu="matMenu" (close)="applyFilter()" [overlapTrigger]="false">
-        <form (click)="$event.stopPropagation()" (keydown.enter)="applyFilter()" (keydown.tab)="$event.stopPropagation()"
-              [formGroup]="filterForm" class="form-menu">
-
-          <!--column-->
-          <mat-form-field [style.width.%]="100">
-            <mat-label>Seleziona Colonna</mat-label>
-            <input [matAutocomplete]="columnAuto" autocomplete="off" formControlName="column" matInput required>
-            <mat-autocomplete #columnAuto="matAutocomplete" autoActiveFirstOption>
-              <mat-option *ngFor="let column of filteredColumnsForm$ | async" [value]="column.name">
-                {{column.name}}
-              </mat-option>
-            </mat-autocomplete>
-          </mat-form-field>
-
-          <!--operation-->
-          <br *ngIf="getFilterColumnType() == 'number' || getFilterColumnType() == 'date'">
-          <mat-form-field *ngIf="getFilterColumnType() == 'number' || getFilterColumnType() == 'date'"
-                          [style.width.%]="100">
-            <mat-label>Seleziona Operazione</mat-label>
-            <mat-select formControlName="operation" required>
-              <mat-option [value]="'='">=</mat-option>
-              <mat-option [value]="'!='">!=</mat-option>
-              <mat-option [value]="'>'">></mat-option>
-              <mat-option [value]="'>='">>=</mat-option>
-              <mat-option [value]="'<'"><</mat-option>
-              <mat-option [value]="'<='"><=</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-
-          <!--value-->
-          <br *ngIf="filterForm.controls.column.value">
-          <mat-form-field
-            *ngIf="getFilterColumnType() == 'string'  || getFilterColumnType() == 'number' || getFilterColumnType() == 'date'"
-            [style.width.%]="100">
-            <mat-label>Seleziona Valore</mat-label>
-
-            <!--string or number-->
-            <input [matAutocomplete]="filterDefault" *ngIf="getFilterColumnType() == 'string'  || getFilterColumnType() == 'number'"
-                   [type]="getFilterColumnType() == 'string' ? 'text' : 'number'" autocomplete="off" formControlName="value"
-                   matInput>
-            <!--filter default-->
-            <mat-autocomplete #filterDefault="matAutocomplete" autoActiveFirstOption>
-              <mat-option *ngFor="let option of getFilterDefault()" [value]="option.value">
-                {{option.title}}
-              </mat-option>
-            </mat-autocomplete>
-
-            <!--date-->
-            <input *ngIf="getFilterColumnType() == 'date'" [matDatepicker]="picker"
-                   formControlName="value" matInput>
-            <mat-datepicker-toggle *ngIf="getFilterColumnType() == 'date'" [for]="picker" matSuffix></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-          </mat-form-field>
-          <!--boolean-->
-          <mat-slide-toggle *ngIf="getFilterColumnType() == 'boolean'" formControlName="value"></mat-slide-toggle>
-
-        </form>
-      </mat-menu>
-
-
-      <mat-chip-list aria-label="Fish selection">
-        <mat-chip (removed)="removeChip(chip)" *ngFor="let chip of chipList">
-          {{chip.column}} {{chip.operation ? chip.operation : '='}} {{chip.value === null || chip.value === '' ? 'NULL' : chip.value}}
-          <mat-icon matChipRemove>cancel</mat-icon>
-        </mat-chip>
-      </mat-chip-list>
-
-    </mat-toolbar>
-
-
-    <mat-progress-bar *ngIf="loading" color="accent" mode="query"></mat-progress-bar>
-
-    <mat-table [dataSource]="elementList" fxHide.lt-md matSort>
-      <ng-container *ngFor="let column of columnList" [matColumnDef]="column.def">
-        <mat-header-cell *matHeaderCellDef [disabled]="!column.sort" mat-sort-header>{{column.name}}</mat-header-cell>
-        <span *ngIf="column.def !== 'actions'">
-      <mat-cell (click)="clickedAction(element)" *matCellDef="let element">{{column.value(element)}}</mat-cell>
-    </span>
-        <span *ngIf="column.def === 'actions'">
-      <mat-cell *matCellDef="let element">
-        <span *ngIf="column.value.length == 1 else moreMenu">
-          <span *ngFor="let action of column.value">
-           <button (click)="actions.emit({type: action.type, element: element })"
-                   *ngIf="action.filter ? action.filter(element) : true"
-                   [matTooltip]="action.type" mat-icon-button>
-             <mat-icon>{{action.icon ? action.icon : action.type}}</mat-icon>
-           </button>
-        </span>
-        </span>
-        <ng-template #moreMenu>
-          <button [matMenuTriggerFor]="entityMenu" mat-icon-button><mat-icon>more_vert</mat-icon></button>
-        <mat-menu #entityMenu="matMenu">
-          <span *ngFor="let action of column.value">
-           <button (click)="actions.emit({type: action.type, element: element })"
-                   *ngIf="action.filter ? action.filter(element) : true"
-                   [matTooltip]="action.type" mat-icon-button>
-             <mat-icon>{{action.icon ? action.icon : action.type}}</mat-icon>
-           </button>
-        </span>
-        </mat-menu>
-        </ng-template>
-      </mat-cell>
-    </span>
-      </ng-container>
-      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: displayedColumns; let i = index; let odd = odd; " [class.odd]="odd"></mat-row>
-    </mat-table>
-
-
-    <mat-table [dataSource]="elementList" fxHide.gt-sm>
-      <ng-container matColumnDef="mobile">
-        <mat-cell (click)="openMobileDialog(element)" *matCellDef="let element">{{columnMobile.value(element)}}</mat-cell>
-      </ng-container>
-      <mat-row *matRowDef="let row; columns: ['mobile']; let i = index; let odd = odd; " [class.odd]="odd"></mat-row>
-    </mat-table>
-
-
-    <mat-paginator [fxHide]="elementList && elementList.length == 0" [length]="elementLenght"
-                   [pageSizeOptions]="[5, 10, 25, 50, 100]" [pageSize]="pageSize"></mat-paginator>
-
-    <div *ngIf="elementList && elementList.length == 0" class="empty-message">
-      <mat-icon>warning</mat-icon>
-      Lista vuota
-    </div>
-  `,
-  styleUrls: [
-    './full-table.component.scss'
-  ]
+  templateUrl: `./full-table.component.html`,
+  styleUrls: ['./full-table.component.scss']
 })
 export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
 

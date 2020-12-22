@@ -1,6 +1,6 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {ColumnListModel} from '../model/column-list.model';
+import {ColumnModel} from '../model/column.model';
 
 @Component({
   selector: 'lib-full-table-dialog',
@@ -25,6 +25,6 @@ export class FullTableDialogComponent implements OnInit {
 
 interface DialogData {
   element: any;
-  columnList: ColumnListModel[];
+  columnList: ColumnModel[];
   actions: any;
 }

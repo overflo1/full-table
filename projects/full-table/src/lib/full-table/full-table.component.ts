@@ -18,7 +18,7 @@ import {HttpClient} from '@angular/common/http';
 import {MatDialog} from '@angular/material/dialog';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {catchError, filter, map, startWith, switchMap} from 'rxjs/operators';
-import {ColumnListModel} from '../model/column-list.model';
+import {ColumnModel} from '../model/column.model';
 import {GetManyModel} from '../model/get-many.model';
 import {FullTableDialogComponent} from '../full-table-dialog/full-table-dialog.component';
 import * as _ from 'lodash';
@@ -32,7 +32,7 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
 
   @Input() path!: string;
   @Input() BASE_PATH = '';
-  @Input() columnList!: ColumnListModel[];
+  @Input() columnList!: ColumnModel[];
   @Input() columnMobile?: any;
   @Input() actions = new EventEmitter<void | { type: string, element: T }>();
   @Input() search: SCondition = {};

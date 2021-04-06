@@ -21,6 +21,7 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {FullTableDialogComponent} from './full-table-dialog/full-table-dialog.component';
 import {MatButtonModule} from '@angular/material/button';
 import {MatInputModule} from '@angular/material/input';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [FullTableComponent, FullTableDialogComponent],
@@ -45,7 +46,8 @@ import {MatInputModule} from '@angular/material/input';
     FlexLayoutModule,
     MatDialogModule,
     MatButtonModule,
-    MatInputModule
+    MatInputModule,
+    MatCheckboxModule,
   ],
   exports: [FullTableComponent]
 })

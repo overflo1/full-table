@@ -1,4 +1,4 @@
-<mat-toolbar class="filter-toolbar" *ngIf="elementList?.length || chipList?.length">
+<mat-toolbar *ngIf="elementList?.length || chipList?.length" class="filter-toolbar">
   <button #menuTrigger="matMenuTrigger" [mat-menu-trigger-for]="filterMenu" mat-icon-button>
     <mat-icon>{{filterForm.valid ? 'done' : 'search'}}</mat-icon>
   </button>
@@ -41,7 +41,8 @@
         <mat-label>Seleziona Valore</mat-label>
 
         <!--string or number-->
-        <input [matAutocomplete]="filterDefault" *ngIf="getFilterColumnType() == 'string'  || getFilterColumnType() == 'number'"
+        <input *ngIf="getFilterColumnType() == 'string'  || getFilterColumnType() == 'number'"
+               [matAutocomplete]="filterDefault"
                [type]="getFilterColumnType() == 'string' ? 'text' : 'number'" autocomplete="off" formControlName="value"
                matInput>
         <!--filter default-->
@@ -80,7 +81,13 @@
   <ng-container *ngFor="let column of columnList" [matColumnDef]="column.def">
     <mat-header-cell *matHeaderCellDef [disabled]="!column.sort" mat-sort-header>{{column.name}}</mat-header-cell>
     <span *ngIf="column.def !== 'actions'">
-      <mat-cell (click)="clickedAction(element)" *matCellDef="let element">{{column.value(element)}}</mat-cell>
+      <mat-cell (click)="clickedAction(element)" *matCellDef="let element">
+        <mat-checkbox *ngIf="isBooleanType(column.value(element)) else renderstring"
+                      [checked]="column.value(element)" disabled="true"></mat-checkbox>
+        <ng-template #renderstring>
+          {{column.value(element)}}
+        </ng-template>
+      </mat-cell>
     </span>
     <span *ngIf="column.def === 'actions'">
       <mat-cell *matCellDef="let element">

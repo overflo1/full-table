@@ -52,7 +52,7 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
 
   filterForm: FormGroup;
 
-  filteredColumnsForm$ = new Observable();
+  filteredColumnsForm$: Observable<ColumnModel[]> = new Observable<ColumnModel[]>();
   chipList: {column: string, operation: string, value: any}[] = [];
 
   constructor(
@@ -271,6 +271,10 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
       }
     }
     return [];
+  }
+
+  isBooleanType(value: any): boolean {
+    return typeof value === 'boolean';
   }
 }
 

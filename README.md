@@ -6,8 +6,8 @@ This project is for the NPM package https://www.npmjs.com/package/@overflo-srl/f
 
 To deploy a new version you have to:
 
-- Build the full table "npx ng build <project-name> --prod"
-- Go on /dist/<project-name>
+- Build the full table "npx ng build full-table --prod"
+- Go on /dist/full-table
 - "npm publish"
 
 Finish.

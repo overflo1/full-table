@@ -90,8 +90,8 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
       this.filteredColumnsForm$ = columControl.valueChanges.pipe(
         startWith(''),
         map(value =>
-          this.columnList.filter((col: { name: string; def: string; }) =>
-            col.name.toLowerCase().includes(value ? value.toLowerCase() : '') && col.def !== 'actions'
+          this.columnList.filter(col =>
+            col.name.toLowerCase().includes(value ? value.toLowerCase() : '') && col.type
           )
         )
       );

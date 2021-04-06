@@ -1,3 +1,16 @@
+@mixin element-with($prefix, $withs...) {
+  @each $i in $withs {
+    #{$prefix}#{nth($i, 1)} {
+      max-width: nth($i, 2);
+      justify-content: nth($i, 3);
+    }
+  }
+}
+
+@include element-with('.mat-column-',
+  'actions' 50px flex-end,
+);
+
 .odd {
   background-color: #f2f2f2;
 }

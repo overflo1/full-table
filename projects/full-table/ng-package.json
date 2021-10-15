@@ -4,14 +4,10 @@
   "lib": {
     "entryFile": "src/public-api.ts",
     "umdModuleIds": {
-      "lodash": "_",
       "@nestjsx/crud-request": "crudRequest"
     }
   },
-  "whitelistedNonPeerDependencies": [
-    "tslib",
+  "allowedNonPeerDependencies": [
     "@nestjsx/crud-request",
-    "@types/lodash",
-    "lodash"
   ]
 }

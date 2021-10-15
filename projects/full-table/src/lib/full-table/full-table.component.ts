@@ -2,7 +2,8 @@ import {
   AfterViewInit,
   Component,
   EventEmitter,
-  HostListener, Inject,
+  HostListener,
+  Inject,
   Input,
   OnChanges,
   OnInit,
@@ -21,7 +22,6 @@ import {catchError, filter, map, startWith, switchMap} from 'rxjs/operators';
 import {ColumnModel} from '../model/column.model';
 import {GetManyModel} from '../model/get-many.model';
 import {FullTableDialogComponent} from '../full-table-dialog/full-table-dialog.component';
-import * as _ from 'lodash';
 
 @Component({
   selector: 'lib-full-table',
@@ -38,6 +38,7 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
   @Input() search: SCondition = {};
   @Input() join?: QueryJoin | QueryJoinArr | (QueryJoin | QueryJoinArr)[];
   @Input() defaultSort?: QuerySort;
+  @Input() defaultFilter?: { name: string, operation?: string, value: string | number }[];
   @Input() pageSize?: number;
   @Output() data = new EventEmitter<any[]>();
 
@@ -53,7 +54,7 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
   filterForm: FormGroup;
 
   filteredColumnsForm$: Observable<ColumnModel[]> = new Observable<ColumnModel[]>();
-  chipList: {column: string, operation: string, value: any}[] = [];
+  chipList: { column: string, operation: string, value: any }[] = [];
 
   constructor(
     private http: HttpClient,
@@ -75,6 +76,11 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
   }
 
   ngOnInit(): void {
+    if (this.defaultFilter?.length) {
+      for (const f of this.defaultFilter) {
+        this.chipList.push({column: f.name, value: f.value, operation: f.operation || '='});
+      }
+    }
     if (!this.columnMobile) {
       this.columnMobile = this.columnList[0];
     }
@@ -96,7 +102,7 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
         )
       );
     }
-    this.displayedColumns = this.columnList.map(x => x.def);
+    this.displayedColumns = this.getViewableColumnList().map(x => x.def);
     this.paginator._intl.firstPageLabel = 'prima pagina';
     this.paginator._intl.itemsPerPageLabel = 'elementi per pagina';
     this.paginator._intl.lastPageLabel = 'ultima pagina';
@@ -164,7 +170,10 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
       let s: any = {};
       for (const f of this.chipList) {
         const cl = this.columnList.find(c => c.name === f.column);
-        const type = cl ? cl.type ? cl.type : 'string' : 'string';
+        if (!isNaN(f.value)) {
+          f.value = +f.value;
+        }
+        const type = cl?.type || typeof f.value;
         if (cl) {
           s[cl.def] = this.getSearchOperation(f.operation, f.value, type);
         } else {
@@ -184,7 +193,6 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
   }
 
   getSearchOperation(op: string, value: any, type: string): SCondition {
-
     if (type === 'string') {
       return {$contL: value};
     }
@@ -226,8 +234,12 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
     this.filterForm.reset();
   }
 
-  removeChip(chip: {column: string, operation: string, value: any}): void {
-    const index = this.chipList.findIndex(c => _.isEqual(c, chip));
+  removeChip(chip: { column: string, operation: string, value: any }): void {
+    const index = this.chipList.findIndex(c =>
+      c.value === chip.value &&
+      c.column === chip.column &&
+      c.operation === c.operation
+    );
     if (index >= 0) {
       this.chipList.splice(index, 1);
     }
@@ -259,7 +271,7 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
     return null;
   }
 
-  getFilterDefault(): {title: string, value: string}[] {
+  getFilterDefault(): { title: string, value: string }[] {
     const columnControl = this.filterForm.get('column');
     if (columnControl) {
       const col = columnControl.value;
@@ -275,6 +287,10 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
 
   isBooleanType(value: any): boolean {
     return typeof value === 'boolean';
+  }
+
+  getViewableColumnList(): ColumnModel[] {
+    return this.columnList.filter(c => c.hidden === null || c.hidden === undefined || !c.hidden);
   }
 }
 

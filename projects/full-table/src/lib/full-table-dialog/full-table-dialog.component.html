@@ -1,5 +1,5 @@
 <mat-dialog-content class="mat-body">
-  <ng-container *ngFor="let column of data.columnList">
+  <ng-container *ngFor="let column of getViewableColumnList()">
     <p style="word-wrap: break-word">
       <b>{{column.name}}: </b>
       <span *ngIf="column.def !== 'actions'">{{column.value(data.element)}}</span>

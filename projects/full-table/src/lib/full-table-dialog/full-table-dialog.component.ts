@@ -21,6 +21,10 @@ export class FullTableDialogComponent implements OnInit {
   ngOnInit(): void {
     this.dialogRef.updateSize('400px');
   }
+
+  getViewableColumnList(): ColumnModel[] {
+    return this.data.columnList.filter(c => c.hidden === null || c.hidden === undefined || !c.hidden);
+  }
 }
 
 interface DialogData {

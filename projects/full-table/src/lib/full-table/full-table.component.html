@@ -1,6 +1,6 @@
 <mat-toolbar *ngIf="elementList?.length || chipList?.length" class="filter-toolbar">
   <button #menuTrigger="matMenuTrigger" [mat-menu-trigger-for]="filterMenu" mat-icon-button>
-    <mat-icon>{{filterForm.valid ? 'done' : 'search'}}</mat-icon>
+    <mat-icon>search</mat-icon>
   </button>
   <mat-menu #filterMenu="matMenu" (close)="applyFilter()" [overlapTrigger]="false">
     <form (click)="$event.stopPropagation()" (keydown.enter)="applyFilter()" (keydown.tab)="$event.stopPropagation()"
@@ -78,7 +78,7 @@
 <mat-progress-bar *ngIf="loading" color="accent" mode="query"></mat-progress-bar>
 
 <mat-table [dataSource]="elementList" fxHide.lt-md matSort>
-  <ng-container *ngFor="let column of columnList" [matColumnDef]="column.def">
+  <ng-container *ngFor="let column of getViewableColumnList()" [matColumnDef]="column.def">
     <mat-header-cell *matHeaderCellDef [disabled]="!column.sort" mat-sort-header>{{column.name}}</mat-header-cell>
     <span *ngIf="column.def !== 'actions'">
       <mat-cell (click)="clickedAction(element)" *matCellDef="let element">

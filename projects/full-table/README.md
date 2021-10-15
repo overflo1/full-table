@@ -23,10 +23,13 @@ interface ColumnListModel {
   type?: string;
   filterDefault?: {title: string, value: string}[];
   sort?: boolean;
+  hidden?: boolean
 }
 ```
 
 OPTIONALS:
+
+`(data): event emitter that emit the array of the showed entities everytime there is an update in the table`
 
 `[columnMobile]: description and settings for your column responsive mobile column (() => string)`
 
@@ -37,5 +40,7 @@ OPTIONALS:
 `[join]: join query based on nestjs/crud`
 
 `[defaultSort]: default sort column query based on nestjs/crud`
+
+`[defaultFilter]: {name: string, operation?: string, value: string | number}[] default filter chip putted at table startup. (can be removed)`
 
 `[pageSize]: page size number (default: 5)`

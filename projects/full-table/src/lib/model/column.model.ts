@@ -5,4 +5,5 @@ export interface ColumnModel {
   type?: string;
   filterDefault?: {title: string, value: string}[];
   sort?: boolean;
+  hidden?: boolean;
 }

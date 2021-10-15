@@ -1,24 +1,16 @@
 {
   "name": "@overflo-srl/full-table",
-  "version": "1.2.2",
+  "version": "3.0.0",
   "peerDependencies": {
-    "@angular/animations": "~11.0.4",
-    "@angular/cdk": "^11.0.3",
-    "@angular/common": "~11.0.4",
-    "@angular/compiler": "~11.0.4",
-    "@angular/core": "~11.0.4",
-    "@angular/flex-layout": "^11.0.0-beta.33",
-    "@angular/forms": "~11.0.4",
-    "@angular/material": "^11.0.3",
-    "@angular/platform-browser": "~11.0.4",
-    "@angular/platform-browser-dynamic": "~11.0.4",
-    "@angular/router": "~11.0.4",
-    "rxjs": "~6.6.0"
-  },
-  "dependencies": {
-    "tslib": "^2.0.0",
-    "@nestjsx/crud-request": "^4.6.2",
-    "@types/lodash": "^4.14.165",
-    "lodash": "^4.17.20"
+    "@angular/animations": "*",
+    "@angular/cdk": "*",
+    "@angular/common": "*",
+    "@angular/compiler": "*",
+    "@angular/core": "*",
+    "@angular/flex-layout": "*",
+    "@angular/forms": "*",
+    "@angular/material": "*",
+    "rxjs": "*",
+    "@nestjsx/crud-request": "*"
   }
 }

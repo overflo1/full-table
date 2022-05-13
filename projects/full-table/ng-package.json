@@ -9,5 +9,6 @@
   },
   "allowedNonPeerDependencies": [
     "@nestjsx/crud-request",
+    "moment"
   ]
 }

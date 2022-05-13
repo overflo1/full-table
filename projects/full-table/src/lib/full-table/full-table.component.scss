@@ -8,7 +8,7 @@
 }
 
 @include element-with('.mat-column-',
-  'actions' 50px flex-end,
+  'actions' 50px flex-start,
 );
 
 .odd {

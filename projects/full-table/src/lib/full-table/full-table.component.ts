@@ -22,6 +22,7 @@ import {catchError, filter, map, startWith, switchMap} from 'rxjs/operators';
 import {ColumnModel} from '../model/column.model';
 import {GetManyModel} from '../model/get-many.model';
 import {FullTableDialogComponent} from '../full-table-dialog/full-table-dialog.component';
+import * as moment from 'moment';
 
 @Component({
   selector: 'lib-full-table',
@@ -225,9 +226,9 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
 
   applyFilter(): void {
     if (this.filterForm.valid) {
-      /*if (moment.isMoment(this.filterForm.value.value)) {
-        this.filterForm.controls.value.setValue(moment(this.filterForm.value.value).format('MM/DD/YYYY'));
-      }*/
+      if (moment.isMoment(this.filterForm.value.value)) {
+        this.filterForm.controls.value.setValue(moment(this.filterForm.value.value).toISOString());
+      }
       this.chipList.push(this.filterForm.value);
       this.actions.emit();
     }

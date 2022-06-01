@@ -79,7 +79,7 @@
 
 <mat-table [dataSource]="elementList" fxHide.lt-md matSort>
   <ng-container *ngFor="let column of getViewableColumnList()" [matColumnDef]="column.def">
-    <mat-header-cell *matHeaderCellDef [disabled]="!column.sort" mat-sort-header>{{column.name}}</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef [disabled]="!column.sort" mat-sort-header [innerHTML]="column.name"></mat-header-cell>
     <span *ngIf="column.def !== 'actions'">
       <mat-cell (click)="clickedAction(element)" *matCellDef="let element">
         <mat-checkbox *ngIf="isBooleanType(column.value(element)) else renderstring"

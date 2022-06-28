@@ -1,6 +1,6 @@
 import {
   AfterViewInit,
-  Component,
+  Component, ElementRef,
   EventEmitter,
   HostListener,
   Inject,
@@ -23,6 +23,8 @@ import {ColumnModel} from '../model/column.model';
 import {GetManyModel} from '../model/get-many.model';
 import {FullTableDialogComponent} from '../full-table-dialog/full-table-dialog.component';
 import * as moment from 'moment';
+import {MatTable} from "@angular/material/table";
+import * as FileSaver from 'file-saver';
 
 @Component({
   selector: 'lib-full-table',
@@ -41,6 +43,7 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
   @Input() defaultSort?: QuerySort;
   @Input() defaultFilter?: { name: string, operation?: string, value: string | number }[];
   @Input() pageSize?: number;
+  @Input() enableExport?: boolean = false;
   @Output() data = new EventEmitter<any[]>();
 
   @ViewChild(MatPaginator, {static: true}) paginator!: MatPaginator;
@@ -49,6 +52,7 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
   displayedColumns!: string[];
   elementLenght = 0;
   loading = true;
+  pageCount = 1;
 
   isMobileLayout = window.innerWidth < 600;
 
@@ -128,6 +132,7 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
         }),
         map(data => {
           this.loading = false;
+          this.pageCount = data.pageCount;
           this.elementLenght = data.total;
           this.data.emit(data.data);
           return data.data;
@@ -292,6 +297,45 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
 
   getViewableColumnList(): ColumnModel[] {
     return this.columnList.filter(c => c.hidden === null || c.hidden === undefined || !c.hidden);
+  }
+
+  async export() {
+    let maxColumnHeadersWidth = 10;
+    let elements : any[] = [], rows : any[] = [];
+    this.loading = true;
+    for(let page = 0; page < this.pageCount; page++) {
+      const result = await this.getData(this.sort.active, this.sort.direction.toUpperCase(), this.paginator.pageSize, page, this.search).toPromise();
+      elements = elements.concat(result?.data || []);
+    }
+
+    for(const element of elements) {
+      const row: any = {}
+      for(const column of this.columnList) {
+        if(column.def != 'actions') {
+          row[column.name] = column?.value(element);
+          maxColumnHeadersWidth = column.name.length > maxColumnHeadersWidth ? column.name.length : maxColumnHeadersWidth;
+        }
+      }
+      rows.push(row);
+    }
+
+    import("xlsx").then(xlsx => {
+      const worksheet = xlsx.utils.json_to_sheet(rows);
+      worksheet["!cols"] = this.columnList.map(column => {return {wch: maxColumnHeadersWidth}}); // set columns header width
+
+      const workbook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
+      const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
+      this.saveAsExcelFile(excelBuffer, "");
+      this.loading = false;
+    });
+  }
+
+  saveAsExcelFile(buffer: any, fileName: string): void {
+    let EXCEL_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+    let EXCEL_EXTENSION = ".xlsx";
+    const data: Blob = new Blob([buffer], {type: EXCEL_TYPE});
+    FileSaver.saveAs(data, fileName + "export_" + new Date().getTime() + EXCEL_EXTENSION
+    );
   }
 }
 

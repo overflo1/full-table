@@ -99,14 +99,14 @@
     </span>
     <span *ngIf="column.def === 'actions'">
       <mat-cell *matCellDef="let element">
-        <span *ngIf="column.value.length == 1 else moreMenu">
+        <span *ngIf="column.value.length == 1 else moreMenu" fxLayout="column">
           <span *ngFor="let action of column.value">
            <button (click)="actions.emit({type: action.type, element: element })"
                    *ngIf="action.filter ? action.filter(element) : true"
                    [matTooltip]="action.type" mat-icon-button>
              <mat-icon>{{action.icon ? action.icon : action.type}}</mat-icon>
            </button>
-        </span>
+          </span>
         </span>
         <ng-template #moreMenu>
           <button [matMenuTriggerFor]="entityMenu" mat-icon-button><mat-icon>more_vert</mat-icon></button>
@@ -114,8 +114,7 @@
             <div fxLayout="column">
               <div *ngFor="let action of column.value">
                <button mat-menu-item (click)="actions.emit({type: action.type, element: element })"
-                       *ngIf="action.filter ? action.filter(element) : true"
-                       [matTooltip]="action.type">
+                       *ngIf="action.filter ? action.filter(element) : true">
                  <mat-icon>{{action.icon ? action.icon : action.type}}</mat-icon>
                  {{action.type}}
                </button>

@@ -4,14 +4,18 @@
       <b [innerHTML]="column.name"></b>
       <span *ngIf="column.def !== 'actions'" style="margin-left: 10px">{{column.value(data.element)}}</span>
       <span *ngIf="column.def === 'actions'">
+        <span fxLayout="column">
         <span *ngFor="let action of column.value">
+
            <button (click)="data.actions.emit({type: action.type, element: data.element })"
                    *ngIf="action.filter ? action.filter(data.element) : true"
                    [matTooltip]="action.type"
-                   mat-dialog-close mat-icon-button>
+                   mat-dialog-close mat-menu-item>
              <mat-icon>{{action.icon ? action.icon : action.type}}</mat-icon>
+             {{action.type}}
            </button>
         </span>
+       </span>
     </span>
     </p>
   </ng-container>

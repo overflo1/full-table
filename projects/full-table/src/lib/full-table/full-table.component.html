@@ -44,7 +44,8 @@
           <!--string or number-->
           <input *ngIf="getFilterColumnType() == 'string'  || getFilterColumnType() == 'number'"
                  [matAutocomplete]="filterDefault"
-                 [type]="getFilterColumnType() == 'string' ? 'text' : 'number'" autocomplete="off" formControlName="value"
+                 [type]="getFilterColumnType() == 'string' ? 'text' : 'number'" autocomplete="off"
+                 formControlName="value"
                  matInput>
           <!--filter default-->
           <mat-autocomplete #filterDefault="matAutocomplete" autoActiveFirstOption>
@@ -56,7 +57,8 @@
           <!--date-->
           <input *ngIf="getFilterColumnType() == 'date'" [matDatepicker]="picker"
                  formControlName="value" matInput>
-          <mat-datepicker-toggle *ngIf="getFilterColumnType() == 'date'" [for]="picker" matSuffix></mat-datepicker-toggle>
+          <mat-datepicker-toggle *ngIf="getFilterColumnType() == 'date'" [for]="picker"
+                                 matSuffix></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
         <!--boolean-->
@@ -74,7 +76,9 @@
     </mat-chip-list>
   </div>
 
-  <button *ngIf="enableExport" mat-icon-button (click)="export()" [matTooltip]="'Esporta in excel'"><mat-icon>file_download</mat-icon></button>
+  <button *ngIf="enableExport" mat-icon-button (click)="export()" [matTooltip]="'Esporta in excel'">
+    <mat-icon>file_download</mat-icon>
+  </button>
 </mat-toolbar>
 
 
@@ -82,7 +86,8 @@
 
 <mat-table [dataSource]="elementList" fxHide.lt-md matSort>
   <ng-container *ngFor="let column of getViewableColumnList()" [matColumnDef]="column.def">
-    <mat-header-cell *matHeaderCellDef [disabled]="!column.sort" mat-sort-header [innerHTML]="column.name"></mat-header-cell>
+    <mat-header-cell *matHeaderCellDef [disabled]="!column.sort" mat-sort-header
+                     [innerHTML]="column.name"></mat-header-cell>
     <span *ngIf="column.def !== 'actions'">
       <mat-cell (click)="clickedAction(element)" *matCellDef="let element">
         <mat-checkbox *ngIf="isBooleanType(column.value(element)) else renderstring"
@@ -94,28 +99,33 @@
     </span>
     <span *ngIf="column.def === 'actions'">
       <mat-cell *matCellDef="let element">
-        <span *ngIf="column.value.length == 1 else moreMenu">
+        <span *ngIf="column.value.length == 1 else moreMenu" fxLayout="column">
           <span *ngFor="let action of column.value">
            <button (click)="actions.emit({type: action.type, element: element })"
                    *ngIf="action.filter ? action.filter(element) : true"
                    [matTooltip]="action.type" mat-icon-button>
              <mat-icon>{{action.icon ? action.icon : action.type}}</mat-icon>
            </button>
-        </span>
+          </span>
         </span>
         <ng-template #moreMenu>
           <button [matMenuTriggerFor]="entityMenu" mat-icon-button><mat-icon>more_vert</mat-icon></button>
         <mat-menu #entityMenu="matMenu">
-          <span *ngFor="let action of column.value">
-           <button (click)="actions.emit({type: action.type, element: element })"
-                   *ngIf="action.filter ? action.filter(element) : true"
-                   [matTooltip]="action.type" mat-icon-button>
-             <mat-icon>{{action.icon ? action.icon : action.type}}</mat-icon>
-           </button>
-        </span>
-        </mat-menu>
-        </ng-template>
-      </mat-cell>
+            <div fxLayout="column">
+              <div *ngFor="let action of column.value">
+               <button mat-menu-item (click)="actions.emit({type: action.type, element: element })"
+                       *ngIf="action.filter ? action.filter(element) : true">
+                 <mat-icon>{{action.icon ? action.icon : action.type}}</mat-icon>
+                 {{action.type}}
+               </button>
+              </div>
+              <div>
+
+              </div>
+            </div>
+    </mat-menu>
+    </ng-template>
+    </mat-cell>
     </span>
   </ng-container>
   <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>

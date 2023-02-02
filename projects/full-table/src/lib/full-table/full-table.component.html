@@ -1,4 +1,4 @@
-<mat-toolbar *ngIf="elementList?.length || chipList?.length" class="filter-toolbar">
+<mat-toolbar *ngIf="elementList?.data?.length || chipList?.length" class="filter-toolbar">
   <div fxLayout="row" fxFlex fxLayoutAlign="start center">
     <button #menuTrigger="matMenuTrigger" [mat-menu-trigger-for]="filterMenu" mat-icon-button>
       <mat-icon>search</mat-icon>
@@ -84,10 +84,9 @@
 
 <mat-progress-bar *ngIf="loading" color="accent" mode="query"></mat-progress-bar>
 
-<mat-table [dataSource]="elementList" fxHide.lt-md matSort>
+<table mat-table [dataSource]="elementList" fxHide.lt-md matSort>
   <ng-container *ngFor="let column of getViewableColumnList()" [matColumnDef]="column.def">
-    <mat-header-cell *matHeaderCellDef [disabled]="!column.sort" mat-sort-header
-                     [innerHTML]="column.name"></mat-header-cell>
+    <th mat-header-cell *matHeaderCellDef [disabled]="!column.sort" mat-sort-header style="flex: 1; border-width: 0"> {{column.name}}</th>
     <span *ngIf="column.def !== 'actions'">
       <mat-cell (click)="clickedAction(element)" *matCellDef="let element">
         <mat-checkbox *ngIf="isBooleanType(column.value(element)) else renderstring"
@@ -130,7 +129,7 @@
   </ng-container>
   <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
   <mat-row *matRowDef="let row; columns: displayedColumns; let i = index; let odd = odd; " [class.odd]="odd"></mat-row>
-</mat-table>
+</table>
 
 
 <mat-table [dataSource]="elementList" fxHide.gt-sm>
@@ -141,10 +140,10 @@
 </mat-table>
 
 
-<mat-paginator [fxHide]="elementList && elementList.length == 0" [length]="elementLenght"
+<mat-paginator [fxHide]="elementList && elementList.data  && elementList.data.length == 0" [length]="elementLenght"
                [pageSizeOptions]="[5, 10, 25, 50, 100]" [pageSize]="pageSize"></mat-paginator>
 
-<div *ngIf="elementList && elementList.length == 0" class="empty-message">
+<div *ngIf="elementList && elementList.data  && elementList.data.length == 0" class="empty-message">
   <mat-icon>warning</mat-icon>
   Lista vuota
 </div>

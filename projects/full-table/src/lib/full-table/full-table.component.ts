@@ -1,6 +1,6 @@
 import {
   AfterViewInit,
-  Component, ElementRef,
+  Component,
   EventEmitter,
   HostListener,
   Inject,
@@ -23,8 +23,8 @@ import {ColumnModel} from '../model/column.model';
 import {GetManyModel} from '../model/get-many.model';
 import {FullTableDialogComponent} from '../full-table-dialog/full-table-dialog.component';
 import * as moment from 'moment';
-import {MatTable} from "@angular/material/table";
 import * as FileSaver from 'file-saver';
+import {MatTableDataSource} from "@angular/material/table";
 
 @Component({
   selector: 'lib-full-table',
@@ -48,7 +48,7 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
 
   @ViewChild(MatPaginator, {static: true}) paginator!: MatPaginator;
   @ViewChild(MatSort, {static: false}) sort!: MatSort;
-  elementList: T[] = [];
+  elementList: MatTableDataSource<T> = new  MatTableDataSource<T>([]);
   displayedColumns!: string[];
   elementLenght = 0;
   loading = true;
@@ -141,7 +141,7 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
           this.loading = false;
           return of([]);
         })
-      ).subscribe((data: T[]) => this.elementList = data);
+      ).subscribe((data: T[]) => this.elementList.data = data);
     const columnControl = this.filterForm.get('column');
     if (columnControl) {
       columnControl.valueChanges.subscribe(() => {

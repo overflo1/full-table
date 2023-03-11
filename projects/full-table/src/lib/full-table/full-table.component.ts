@@ -12,11 +12,11 @@ import {
   ViewChild
 } from '@angular/core';
 import {QueryJoin, QueryJoinArr, QuerySort, RequestQueryBuilder, SCondition} from '@nestjsx/crud-request';
-import {MatPaginator} from '@angular/material/paginator';
+import {MatLegacyPaginator as MatPaginator} from '@angular/material/legacy-paginator';
 import {MatSort} from '@angular/material/sort';
 import {merge, Observable, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
-import {MatDialog} from '@angular/material/dialog';
+import {MatLegacyDialog as MatDialog} from '@angular/material/legacy-dialog';
 import {UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {catchError, filter, map, startWith, switchMap} from 'rxjs/operators';
 import {ColumnModel} from '../model/column.model';
@@ -24,7 +24,7 @@ import {GetManyModel} from '../model/get-many.model';
 import {FullTableDialogComponent} from '../full-table-dialog/full-table-dialog.component';
 import * as moment from 'moment';
 import * as FileSaver from 'file-saver';
-import {MatTableDataSource} from "@angular/material/table";
+import {MatLegacyTableDataSource as MatTableDataSource} from "@angular/material/legacy-table";
 
 @Component({
   selector: 'lib-full-table',

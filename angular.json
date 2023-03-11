@@ -46,6 +46,5 @@
     }},
   "cli": {
     "analytics": "68e61051-9eea-4c64-ae6f-118a8bff87ff"
-  },
-  "defaultProject": "full-table"
+  }
 }

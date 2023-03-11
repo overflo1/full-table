@@ -17,7 +17,7 @@ import {MatSort} from '@angular/material/sort';
 import {merge, Observable, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {MatDialog} from '@angular/material/dialog';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {catchError, filter, map, startWith, switchMap} from 'rxjs/operators';
 import {ColumnModel} from '../model/column.model';
 import {GetManyModel} from '../model/get-many.model';
@@ -56,7 +56,7 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
 
   isMobileLayout = window.innerWidth < 600;
 
-  filterForm: FormGroup;
+  filterForm: UntypedFormGroup;
 
   filteredColumnsForm$: Observable<ColumnModel[]> = new Observable<ColumnModel[]>();
   chipList: { column: string, operation: string, value: any }[] = [];
@@ -64,7 +64,7 @@ export class FullTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
   constructor(
     private http: HttpClient,
     private dialog: MatDialog,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     @Inject('BASE_PATH') BASE_PATH: string,
   ) {
     this.BASE_PATH = BASE_PATH;

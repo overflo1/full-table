@@ -24,32 +24,31 @@ import {MatInputModule} from '@angular/material/input';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 
 @NgModule({
-  declarations: [FullTableComponent, FullTableDialogComponent],
-  entryComponents: [FullTableDialogComponent],
-  imports: [
-    CommonModule,
-    MatToolbarModule,
-    MatIconModule,
-    MatMenuModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatAutocompleteModule,
-    MatSelectModule,
-    MatDatepickerModule,
-    MatSlideToggleModule,
-    MatChipsModule,
-    MatProgressBarModule,
-    MatTableModule,
-    MatSortModule,
-    MatTooltipModule,
-    MatPaginatorModule,
-    FlexLayoutModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatInputModule,
-    MatCheckboxModule,
-  ],
-  exports: [FullTableComponent]
+    declarations: [FullTableComponent, FullTableDialogComponent],
+    imports: [
+        CommonModule,
+        MatToolbarModule,
+        MatIconModule,
+        MatMenuModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatAutocompleteModule,
+        MatSelectModule,
+        MatDatepickerModule,
+        MatSlideToggleModule,
+        MatChipsModule,
+        MatProgressBarModule,
+        MatTableModule,
+        MatSortModule,
+        MatTooltipModule,
+        MatPaginatorModule,
+        FlexLayoutModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatInputModule,
+        MatCheckboxModule,
+    ],
+    exports: [FullTableComponent]
 })
 export class FullTableModule {
   static forRoot(BASE_PATH?: string): ModuleWithProviders<FullTableModule> {
